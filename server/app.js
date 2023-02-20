@@ -15,6 +15,7 @@ mongoose
   })
   .then(() => console.log(`db connection successful`));
 
+//start express app
 const app = express();
 
 // body parsing middleware
