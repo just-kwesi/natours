@@ -48,6 +48,37 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.get('/tour-stats', async (req, res) => {
+  try {
+    const stats = await Tours.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: null,
+          numTours: { $count: {} },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $avg: '$price' },
+          maxPrice: { $avg: '$price' },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour: stats,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'aggregate failed',
+      message: err,
+    });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
