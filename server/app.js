@@ -3,6 +3,12 @@ const express = require('express');
 const morgan = require('morgan');
 require('dotenv').config({ path: './config.env' });
 
+process.on('uncaughtException', (err) => {
+  console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.log(err.name, err.message);
+  process.exit(1);
+});
+
 const AppError = require('./utils/appError');
 // const globalErrorHandler = require('./controllers/errorController');
 const errorController = require('./controllers/errorController');
@@ -42,6 +48,14 @@ app.all('*', (req, res, next) => {
 app.use(errorController);
 
 const PORT = 8000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`App listing on port ${PORT}`);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
 });
