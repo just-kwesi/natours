@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const Tours = require('../db');
 const APIFeatures = require('../utils/apiFeatures');
+const AppError = require('../utils/appError');
 
 module.exports = router;
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
     // execute query
     const features = new APIFeatures(Tours.find(), req.query)
@@ -23,14 +24,11 @@ router.get('/', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'failed',
-      message: err,
-    });
+    next(err);
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   try {
     const newTour = await Tours.create(req.body);
     res.status(201).json({
@@ -40,15 +38,11 @@ router.post('/', async (req, res) => {
       },
     });
   } catch (err) {
-    // console.log(err);
-    res.status(400).json({
-      status: 'failed',
-      message: err,
-    });
+    next(err);
   }
 });
 
-router.get('/tour-stats', async (req, res) => {
+router.get('/tour-stats', async (req, res, next) => {
   try {
     const stats = await Tours.aggregate([
       {
@@ -72,17 +66,18 @@ router.get('/tour-stats', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'aggregate failed',
-      message: err,
-    });
+    next(err);
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const tour = await Tours.findById(id);
+    const tour = await Tours.findById(req.params.id);
+
+    if (!tour) {
+      return next(new AppError('No tour found with this ID', 404));
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -90,18 +85,20 @@ router.get('/:id', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'failed',
-      message: err,
-    });
+    next(err);
   }
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', async (req, res, next) => {
   try {
     const newTour = await Tours.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
+      runValidators: true,
     });
+
+    if (!newTour) {
+      return next(new AppError('No tour found with this ID', 404));
+    }
 
     res.status(201).json({
       status: 'success',
@@ -110,18 +107,16 @@ router.patch('/:id', async (req, res) => {
       },
     });
   } catch (err) {
-    // console.log(err);
-    res.status(400).json({
-      status: 'failed',
-      message: err,
-    });
+    next(err);
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
   try {
     const deletedTour = await Tours.findByIdAndDelete(req.params.id);
-
+    if (!deletedTour) {
+      return next(new AppError('No tour found with this ID', 404));
+    }
     res.status(200).json({
       status: 'success',
       data: {
@@ -129,10 +124,6 @@ router.delete('/:id', async (req, res) => {
       },
     });
   } catch (err) {
-    // console.log(err);
-    res.status(400).json({
-      status: 'failed',
-      message: err,
-    });
+    next(err);
   }
 });

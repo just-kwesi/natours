@@ -6,6 +6,6 @@ router.use('/tours', require('./tours'));
 
 router.use((req, res, next) => {
   const error = new Error('Not Found');
-  error.status = 404;
+  error.statusCode = 404;
   next(error);
 });
