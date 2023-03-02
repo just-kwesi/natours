@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { isEmail } = require('validator)';
+const { isEmail } = require('validator');
 
 const userSchema = new mongoose.Schema(
   {
@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema(
     },
     passwordConfirm: {
       type: String,
-      required: [true, 'A user must have a name'],
       required: [true, 'Please provide a password'],
       minlength: 8,
     },
@@ -36,3 +35,5 @@ const userSchema = new mongoose.Schema(
 );
 
 const User = mongoose.model('User', userSchema);
+
+module.exports = User;

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const Tours = require('../db');
+const Tours = require('../db/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 
