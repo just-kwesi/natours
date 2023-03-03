@@ -1,11 +1,12 @@
 const router = require('express').Router();
 const Tours = require('../db/tourModel');
+const authController = require('../controllers/authController');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 
 module.exports = router;
 
-router.get('/', async (req, res, next) => {
+router.get('/', authController.protect, async (req, res, next) => {
   try {
     // execute query
     const features = new APIFeatures(Tours.find(), req.query)

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { isEmail } = require('validator');
 const bcrypt = require('bcryptjs');
-const { use } = require('../api');
 
 const userSchema = new mongoose.Schema(
   {
@@ -32,6 +31,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide a password'],
       minlength: 8,
+      select: false,
       validate: {
         // This only works on Save and create!!
         validator: function (el) {
