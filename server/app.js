@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config({ path: './config.env' });
 
 process.on('uncaughtException', (err) => {
@@ -28,11 +29,22 @@ mongoose
 //start express app
 const app = express();
 
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+app.use('/api', limiter);
+
 // body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(morgan('dev'));
 
 app.use('/api/v1', require('./api'));
 
