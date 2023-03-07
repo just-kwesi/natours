@@ -112,19 +112,24 @@ router.patch('/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/:id', async (req, res, next) => {
-  try {
-    const deletedTour = await Tours.findByIdAndDelete(req.params.id);
-    if (!deletedTour) {
-      return next(new AppError('No tour found with this ID', 404));
+router.delete(
+  '/:id',
+  authController.protect,
+  authController.restrictTo('admin', 'lead-guide'),
+  async (req, res, next) => {
+    try {
+      const deletedTour = await Tours.findByIdAndDelete(req.params.id);
+      if (!deletedTour) {
+        return next(new AppError('No tour found with this ID', 404));
+      }
+      res.status(200).json({
+        status: 'success',
+        data: {
+          tour: deletedTour,
+        },
+      });
+    } catch (err) {
+      next(err);
     }
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour: deletedTour,
-      },
-    });
-  } catch (err) {
-    next(err);
   }
-});
+);
