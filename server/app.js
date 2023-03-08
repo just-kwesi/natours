@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 require('dotenv').config({ path: './config.env' });
 
 process.on('uncaughtException', (err) => {
@@ -29,6 +30,9 @@ mongoose
 //start express app
 const app = express();
 
+// SECURITY HTTP headers
+app.use(helmet());
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
@@ -43,8 +47,11 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // body parsing middleware
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Serving static files
+app.use(express.static(`${__dirname}/public`));
 
 app.use('/api/v1', require('./api'));
 
