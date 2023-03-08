@@ -3,6 +3,9 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+
 require('dotenv').config({ path: './config.env' });
 
 process.on('uncaughtException', (err) => {
@@ -49,6 +52,12 @@ app.use('/api', limiter);
 // body parsing middleware
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
+
+//Data sanitization against Nosql query injection
+app.use(mongoSanitize());
+
+//Data sanitization against XSS
+app.use(xss());
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
