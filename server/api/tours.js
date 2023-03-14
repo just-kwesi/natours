@@ -62,6 +62,8 @@ router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
   .get(tourController.getToursWithin);
 
+router.route('/distance/:latlng/unit/:unit').get(tourController.getDistances);
+
 router.use('/:tourId/reviews', reviewRouter);
 
 // OLDER IMPLEMENTATIONS
