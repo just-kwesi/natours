@@ -9,19 +9,16 @@ module.exports = router;
 
 router
   .route('/')
-  .get(authController.protect, handlerFactory.getAll(Tours))
+  .get(handlerFactory.getAll(Tours))
   .post(
     authController.protect,
-    authController.restrictTo('admin'),
+    authController.restrictTo('admin', 'lead-guide'),
     handlerFactory.createOne(Tours)
   );
 
 router
   .route(':/id')
-  .get(
-    authController.protect,
-    handlerFactory.getOne(Tours, { path: 'reviews' })
-  )
+  .get(handlerFactory.getOne(Tours, { path: 'reviews' }))
   .patch(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
@@ -33,7 +30,7 @@ router
     handlerFactory.deleteOne(Tours)
   );
 
-router.get('/tour-stats', authController.protect, async (req, res, next) => {
+router.get('/tour-stats', async (req, res, next) => {
   try {
     const stats = await Tours.aggregate([
       {
