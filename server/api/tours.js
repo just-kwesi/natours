@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const Tours = require('../db/tourModel');
 const authController = require('../controllers/authController');
-// const AppError = require('../utils/appError');
 const handlerFactory = require('../controllers/handlerFactory');
+const tourController = require('../controllers/tourController');
 const reviewRouter = require('./reviews');
 
 module.exports = router;
@@ -57,6 +57,10 @@ router.get('/tour-stats', async (req, res, next) => {
     next(err);
   }
 });
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
 
 router.use('/:tourId/reviews', reviewRouter);
 
