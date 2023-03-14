@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Tours = require('../db/tourModel');
 const authController = require('../controllers/authController');
 const APIFeatures = require('../utils/apiFeatures');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
 const handlerFactory = require('../controllers/handlerFactory');
 const reviewRouter = require('./reviews');
 
@@ -66,40 +66,26 @@ router.get('/tour-stats', authController.protect, async (req, res, next) => {
   }
 });
 
-router.get('/:id', authController.protect, async (req, res, next) => {
-  try {
-    const tour = await Tours.findById(req.params.id).populate('reviews');
-
-    if (!tour) {
-      return next(new AppError('No tour found with this ID', 404));
-    }
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour: tour,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.patch(
-  '/:id',
-  authController.protect,
-  authController.restrictTo('admin', 'lead-guide'),
-  handlerFactory.updateOne(Tours)
-);
-
-router.delete(
-  '/:id',
-  authController.protect,
-  authController.restrictTo('admin', 'lead-guide'),
-  handlerFactory.deleteOne(Tours)
-);
+router
+  .route(':/id')
+  .get(
+    authController.protect,
+    handlerFactory.getOne(Tours, { path: 'reviews' })
+  )
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    handlerFactory.updateOne(Tours)
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    handlerFactory.deleteOne(Tours)
+  );
 
 router.use('/:tourId/reviews', reviewRouter);
+
+// OLDER IMPLEMENTATIONS
 
 // router.patch('/:id', async (req, res, next) => {
 //   try {
@@ -154,3 +140,22 @@ router.use('/:tourId/reviews', reviewRouter);
 //     authController.restrictTo('user'),
 //     reviewController.createReview
 //   );
+
+// router.get('/:id', authController.protect, async (req, res, next) => {
+//   try {
+//     const tour = await Tours.findById(req.params.id).populate('reviews');
+
+//     if (!tour) {
+//       return next(new AppError('No tour found with this ID', 404));
+//     }
+
+//     res.status(200).json({
+//       status: 'success',
+//       data: {
+//         tour: tour,
+//       },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
