@@ -17,7 +17,7 @@ router
   );
 
 router
-  .route(':/id')
+  .route('/:id')
   .get(handlerFactory.getOne(Tours, { path: 'reviews' }))
   .patch(
     authController.protect,
