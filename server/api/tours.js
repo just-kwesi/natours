@@ -31,21 +31,14 @@ router.get('/', authController.protect, async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
-  try {
-    const newTour = await Tours.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      data: {
-        tour: newTour,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+router.post(
+  '/',
+  authController.protect,
+  authController.restrictTo('admin'),
+  handlerFactory.createOne(Tours)
+);
 
-router.get('/tour-stats', async (req, res, next) => {
+router.get('/tour-stats', authController.protect, async (req, res, next) => {
   try {
     const stats = await Tours.aggregate([
       {
@@ -73,7 +66,7 @@ router.get('/tour-stats', async (req, res, next) => {
   }
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', authController.protect, async (req, res, next) => {
   try {
     const tour = await Tours.findById(req.params.id).populate('reviews');
 
@@ -92,50 +85,66 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.patch('/:id', async (req, res, next) => {
-  try {
-    const newTour = await Tours.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!newTour) {
-      return next(new AppError('No tour found with this ID', 404));
-    }
-
-    res.status(201).json({
-      status: 'success',
-      data: {
-        tour: newTour,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+router.patch(
+  '/:id',
+  authController.protect,
+  authController.restrictTo('admin', 'lead-guide'),
+  handlerFactory.updateOne(Tours)
+);
 
 router.delete(
   '/:id',
   authController.protect,
   authController.restrictTo('admin', 'lead-guide'),
   handlerFactory.deleteOne(Tours)
-  // async (req, res, next) => {
-  //   try {
-  //     const deletedTour = await Tours.findByIdAndDelete(req.params.id);
-  //     if (!deletedTour) {
-  //       return next(new AppError('No tour found with this ID', 404));
-  //     }
-  //     res.status(200).json({
-  //       status: 'success',
-  //       data: {
-  //         tour: deletedTour,
-  //       },
-  //     });
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // }
 );
+
+router.use('/:tourId/reviews', reviewRouter);
+
+// router.patch('/:id', async (req, res, next) => {
+//   try {
+//     const newTour = await Tours.findByIdAndUpdate(req.params.id, req.body, {
+//       new: true,
+//       runValidators: true,
+//     });
+
+//     if (!newTour) {
+//       return next(new AppError('No tour found with this ID', 404));
+//     }
+
+//     res.status(201).json({
+//       status: 'success',
+//       data: {
+//         tour: newTour,
+//       },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
+// router.delete(
+//   '/:id',
+//   authController.protect,
+//   authController.restrictTo('admin', 'lead-guide'),
+//   handlerFactory.deleteOne(Tours)
+// async (req, res, next) => {
+//   try {
+//     const deletedTour = await Tours.findByIdAndDelete(req.params.id);
+//     if (!deletedTour) {
+//       return next(new AppError('No tour found with this ID', 404));
+//     }
+//     res.status(200).json({
+//       status: 'success',
+//       data: {
+//         tour: deletedTour,
+//       },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// }
+// );
 
 // REVIEWS
 // router
@@ -145,5 +154,3 @@ router.delete(
 //     authController.restrictTo('user'),
 //     reviewController.createReview
 //   );
-
-router.use('/:tourId/reviews', reviewRouter);

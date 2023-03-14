@@ -1,5 +1,6 @@
 const User = require('../db/userModel');
 const AppError = require('../utils/appError');
+const handlerFactory = require('./handlerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -72,3 +73,6 @@ exports.deleteMe = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.deleteUser = handlerFactory.deleteOne(User);
+exports.updateUser = handlerFactory.updateOne(User);
