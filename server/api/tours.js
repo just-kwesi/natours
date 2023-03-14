@@ -1,42 +1,37 @@
 const router = require('express').Router();
 const Tours = require('../db/tourModel');
 const authController = require('../controllers/authController');
-const APIFeatures = require('../utils/apiFeatures');
 // const AppError = require('../utils/appError');
 const handlerFactory = require('../controllers/handlerFactory');
 const reviewRouter = require('./reviews');
 
 module.exports = router;
 
-router.get('/', authController.protect, async (req, res, next) => {
-  try {
-    // execute query
-    const features = new APIFeatures(Tours.find(), req.query)
-      .filter()
-      .sort()
-      .limitField()
-      .paginate();
+router
+  .route('/')
+  .get(authController.protect, handlerFactory.getAll(Tours))
+  .post(
+    authController.protect,
+    authController.restrictTo('admin'),
+    handlerFactory.createOne(Tours)
+  );
 
-    const tours = await features.query;
-    //response
-    res.status(200).json({
-      status: 'success',
-      results: tours.length,
-      data: {
-        tours,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.post(
-  '/',
-  authController.protect,
-  authController.restrictTo('admin'),
-  handlerFactory.createOne(Tours)
-);
+router
+  .route(':/id')
+  .get(
+    authController.protect,
+    handlerFactory.getOne(Tours, { path: 'reviews' })
+  )
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    handlerFactory.updateOne(Tours)
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    handlerFactory.deleteOne(Tours)
+  );
 
 router.get('/tour-stats', authController.protect, async (req, res, next) => {
   try {
@@ -66,26 +61,32 @@ router.get('/tour-stats', authController.protect, async (req, res, next) => {
   }
 });
 
-router
-  .route(':/id')
-  .get(
-    authController.protect,
-    handlerFactory.getOne(Tours, { path: 'reviews' })
-  )
-  .patch(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    handlerFactory.updateOne(Tours)
-  )
-  .delete(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    handlerFactory.deleteOne(Tours)
-  );
-
 router.use('/:tourId/reviews', reviewRouter);
 
 // OLDER IMPLEMENTATIONS
+
+// router.get('/', authController.protect, async (req, res, next) => {
+//   try {
+//     // execute query
+//     const features = new APIFeatures(Tours.find(), req.query)
+//       .filter()
+//       .sort()
+//       .limitField()
+//       .paginate();
+
+//     const tours = await features.query;
+//     //response
+//     res.status(200).json({
+//       status: 'success',
+//       results: tours.length,
+//       data: {
+//         tours,
+//       },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
 
 // router.patch('/:id', async (req, res, next) => {
 //   try {

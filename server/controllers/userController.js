@@ -10,24 +10,9 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = async (req, res, next) => {
-  try {
-    const users = await User.find();
-
-    res.status(200).json({
-      status: 'success',
-      results: users.length,
-      data: {
-        users,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 exports.updateMe = async (req, res, next) => {
   try {
+    // 1) Create error if user POSTs password data
     if (req.body.password || req.body.passwordConfirm) {
       return next(
         new AppError(
@@ -74,5 +59,6 @@ exports.deleteMe = async (req, res, next) => {
   }
 };
 
+exports.getAllUsers = handlerFactory.getAll(User);
 exports.deleteUser = handlerFactory.deleteOne(User);
 exports.updateUser = handlerFactory.updateOne(User);
