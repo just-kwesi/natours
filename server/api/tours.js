@@ -3,6 +3,8 @@ const Tours = require('../db/tourModel');
 const authController = require('../controllers/authController');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
+const handlerFactory = require('../controllers/handlerFactory');
+const reviewRouter = require('./reviews');
 
 module.exports = router;
 
@@ -73,7 +75,7 @@ router.get('/tour-stats', async (req, res, next) => {
 
 router.get('/:id', async (req, res, next) => {
   try {
-    const tour = await Tours.findById(req.params.id);
+    const tour = await Tours.findById(req.params.id).populate('reviews');
 
     if (!tour) {
       return next(new AppError('No tour found with this ID', 404));
@@ -116,20 +118,32 @@ router.delete(
   '/:id',
   authController.protect,
   authController.restrictTo('admin', 'lead-guide'),
-  async (req, res, next) => {
-    try {
-      const deletedTour = await Tours.findByIdAndDelete(req.params.id);
-      if (!deletedTour) {
-        return next(new AppError('No tour found with this ID', 404));
-      }
-      res.status(200).json({
-        status: 'success',
-        data: {
-          tour: deletedTour,
-        },
-      });
-    } catch (err) {
-      next(err);
-    }
-  }
+  handlerFactory.deleteOne(Tours)
+  // async (req, res, next) => {
+  //   try {
+  //     const deletedTour = await Tours.findByIdAndDelete(req.params.id);
+  //     if (!deletedTour) {
+  //       return next(new AppError('No tour found with this ID', 404));
+  //     }
+  //     res.status(200).json({
+  //       status: 'success',
+  //       data: {
+  //         tour: deletedTour,
+  //       },
+  //     });
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
 );
+
+// REVIEWS
+// router
+//   .route('/:tourId/reviews')
+//   .post(
+//     authController.protect,
+//     authController.restrictTo('user'),
+//     reviewController.createReview
+//   );
+
+router.use('/:tourId/reviews', reviewRouter);

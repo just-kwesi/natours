@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-require('dotenv').config({ path: '../../config.env' });
+require('dotenv').config({ path: './config.env' });
 const fs = require('fs');
 
-const Tours = require('../../server/db');
+const Tours = require('../../server/db/tourModel');
 
 //db connection
 const DB = process.env.MONGODB_CONNECTION_STRING.replace(
@@ -16,9 +16,7 @@ mongoose
   })
   .then(() => console.log(`db connection successful`));
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf8')
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf8'));
 
 const exportData = async () => {
   try {
@@ -34,7 +32,7 @@ const exportData = async () => {
 const deleteData = async () => {
   try {
     await Tours.deleteMany();
-    console.log('Data successsfully deletde!');
+    console.log('Data successsfully deleted!');
     mongoose.connection.close();
   } catch (err) {
     console.log(err);
