@@ -81,11 +81,11 @@ app.use(
   })
 );
 
-app.get('/', (req, res) => {
-  res.status(200).render('base');
-});
-
+//api routes
 app.use('/api/v1', require('./api'));
+
+//views routes
+app.use('/', require('./viewRoutes'));
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
