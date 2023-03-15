@@ -8,6 +8,47 @@ const reviewRouter = require('./reviews');
 module.exports = router;
 
 router
+  .route('/top-5-cheap')
+  .get(tourController.aliasTopTours, handlerFactory.getAll(Tours));
+
+router
+  .route('/monthly-plan/:year')
+  .get(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    tourController.getMonthlyPlan
+  );
+
+router.get('/tour-stats', async (req, res, next) => {
+  try {
+    const stats = await Tours.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour: stats,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router
   .route('/')
   .get(handlerFactory.getAll(Tours))
   .post(
@@ -29,34 +70,6 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     handlerFactory.deleteOne(Tours)
   );
-
-router.get('/tour-stats', async (req, res, next) => {
-  try {
-    const stats = await Tours.aggregate([
-      {
-        $match: { ratingsAverage: { $gte: 4.5 } },
-      },
-      {
-        $group: {
-          _id: null,
-          numTours: { $count: {} },
-          avgRating: { $avg: '$ratingsAverage' },
-          avgPrice: { $avg: '$price' },
-          minPrice: { $avg: '$price' },
-          maxPrice: { $avg: '$price' },
-        },
-      },
-    ]);
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour: stats,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
 
 router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
