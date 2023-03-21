@@ -5,4 +5,4 @@ const viewController = require('../controllers/viewsController');
 module.exports = router;
 
 router.get('/', viewController.getOverview);
-router.get('/tour', viewController.getTour);
+router.get('/tours/:slug', viewController.getTour);
