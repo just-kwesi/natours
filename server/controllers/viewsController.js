@@ -29,3 +29,23 @@ exports.getTour = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getLoginForm = async (req, res, next) => {
+  try {
+    res.status(200).render('login', {
+      title: 'Login',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getSignupForm = async (req, res, next) => {
+  try {
+    res.status(200).render('signup', {
+      title: 'Signup',
+    });
+  } catch (error) {
+    next(error);
+  }
+};

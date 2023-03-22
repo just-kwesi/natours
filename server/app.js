@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 require('dotenv').config({ path: './config.env' });
 
@@ -90,6 +91,9 @@ app.use('/api', limiter);
 // body parsing middleware
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// cookie parser
+app.use(cookieParser());
 
 //Data sanitization against Nosql query injection
 app.use(mongoSanitize());
