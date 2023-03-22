@@ -5,15 +5,17 @@
   "engines": {
     "node": "~18.12.1"
   },
-  "main": "index.js",
   "scripts": {
     "start": "nodemon ./server/app.js",
     "start:prod": "NODE_ENV=production nodemon ./server/app.js",
-    "debug": "ndb ./server/app.js"
+    "debug": "ndb ./server/app.js",
+    "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js --public-url .",
+    "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js --public-url ."
   },
   "author": "Frederick",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "axios": "^1.3.4",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
@@ -42,6 +44,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "nodemon": "^2.0.20",
+    "parcel-bundler": "^1.12.5",
     "prettier": "^2.8.4"
   }
 }

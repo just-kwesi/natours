@@ -12,3 +12,7 @@ node_modules
 
 # Ignore SASS config files
 .sass-cache
+
+# Ignore cache
+*.cache
+.parcel-cache
