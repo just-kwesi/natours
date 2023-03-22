@@ -16,11 +16,14 @@ exports.getOverview = async (req, res, next) => {
 exports.getTour = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    const tour = await Tour.find({ slug });
+    const tour = await Tour.find({ slug }).populate({
+      path: 'reviews',
+      fields: 'review rating user',
+    });
 
     res.status(200).render('tour', {
-      title: tour.name,
-      tour,
+      title: `${tour[0].name}`,
+      tour: tour[0],
     });
   } catch (error) {
     next(error);
