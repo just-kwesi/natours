@@ -77,6 +77,13 @@ exports.login = async (req, res, next) => {
     next(error);
   }
 };
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
 
 exports.protect = async (req, res, next) => {
   try {
