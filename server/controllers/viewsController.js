@@ -53,3 +53,14 @@ exports.getSignupForm = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getAccount = (req, res, next) => {
+  try {
+    // console.log(res);
+    res.status(200).render('account', {
+      title: 'My Account',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
