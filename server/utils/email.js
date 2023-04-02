@@ -1,9 +1,23 @@
 const nodemailer = require('nodemailer');
+const pug = require('pug');
+const htmlToText = require('html-to-text');
 
-const sendEmail = async (options) => {
-  try {
+module.exports = class Email {
+  constructor(user, url) {
+    this.to = user.email;
+    this.firtName = user.name.split(' ')[0];
+    this.url = url;
+    this.from = `Natours <${process.env.EMAIL_FROM}>`;
+  }
+
+  createTransport() {
+    if (process.env.NODE_ENV === 'production') {
+      // use sendgrid
+      return 1;
+    }
+
     //1) create a transporter
-    const transporter = nodemailer.createTransport({
+    return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
       auth: {
@@ -11,19 +25,41 @@ const sendEmail = async (options) => {
         pass: process.env.EMAIL_PASSWORD,
       },
     });
-    //2) define email options
-    const mailOptions = {
-      from: 'Natours <hello@natours.io>',
-      to: options.email,
-      subject: options.subject,
-      text: options.message,
-    };
-    //3) send the email
+  }
 
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.log(error);
+  async send(template, subject) {
+    //send actual email
+    // 1) render the email html
+    const html = pug.renderFile(
+      `${__dirname}/../../views/email/${template}.pug`,
+      {
+        firstName: this.firstName,
+        url: this.url,
+        subject,
+      }
+    );
+
+    // 2) define the email options
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject,
+      html,
+      text: htmlToText.convert(html, { wordwrap: 130 }),
+    };
+    //  3) create a transport and send email
+
+    await this.createTransport().sendMail(mailOptions);
+  }
+
+  async sendWelcome() {
+    await this.send('welcome', 'Welcome to the natours family');
+  }
+
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Your password reset token (valid for only 10 minutes)'
+    );
   }
 };
-
-module.exports = sendEmail;
