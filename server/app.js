@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 const scriptSrcUrls = [
   'https://api.tiles.mapbox.com/',
   'https://api.mapbox.com/',
+  'https://js.stripe.com/v3/',
 ];
 const styleSrcUrls = [
   'https://api.mapbox.com/',
@@ -57,6 +58,7 @@ const connectSrcUrls = [
   'https://a.tiles.mapbox.com/',
   'https://b.tiles.mapbox.com/',
   'https://events.mapbox.com/',
+  'https://js.stripe.com/',
 ];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 app.use(
