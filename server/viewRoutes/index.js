@@ -7,7 +7,7 @@ const bookingController = require('../controllers/bookingController');
 module.exports = router;
 router.get(
   '/',
-  bookingController.createBookingCheckout,
+  // bookingController.createBookingCheckout,
   authController.isLoggedIn,
   viewController.getOverview
 );

@@ -20,8 +20,8 @@ process.on('uncaughtException', (err) => {
 });
 
 const AppError = require('./utils/appError');
-// const globalErrorHandler = require('./controllers/errorController');
 const errorController = require('./controllers/errorController');
+const bookingController = require('./controllers/bookingController');
 
 //db connection
 const DB = process.env.MONGODB_CONNECTION_STRING.replace(
@@ -94,6 +94,11 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'applicattion/json' }),
+  bookingController.webhookCheckout
+);
 
 // body parsing middleware
 app.use(express.json({ limit: '10kb' }));
