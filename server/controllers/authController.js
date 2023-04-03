@@ -44,15 +44,17 @@ exports.signup = async (req, res, next) => {
     await new Email(newUser, url).sendWelcome();
 
     //jwt
-    const token = signToken(newUser._id);
 
-    res.status(201).json({
-      status: 'success',
-      token,
-      data: {
-        user: newUser,
-      },
-    });
+    createSendToken(newUser, 200, res);
+    // const token = signToken(newUser._id);
+
+    // res.status(201).json({
+    //   status: 'success',
+    //   token,
+    //   data: {
+    //     user: newUser,
+    //   },
+    // });
   } catch (err) {
     next(err);
   }
