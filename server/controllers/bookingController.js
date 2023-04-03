@@ -7,8 +7,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 exports.getCheckoutSession = async (req, res, next) => {
   try {
     // get the current booked tour
-
-    const tour = await Tour.findById(req.params.tourID);
+    const tour = await Tour.findById(req.params.tourId);
 
     //with the new stripe api
 
@@ -30,9 +29,9 @@ exports.getCheckoutSession = async (req, res, next) => {
     //2 create checkout session and send to client
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      success_url: `${req.protocol}://${req.get('host')}?tours=${
-        req.params.tourId
-      }&user=${req.user.id}&price=${tour.price}`,
+      success_url: `${req.protocol}://${req.get(
+        'host'
+      )}/my-tours?alert=booking`,
       cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
       customer_email: req.user.email,
       client_reference_id: req.params.tourId,

@@ -9,6 +9,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 require('dotenv').config({ path: './config.env' });
 
@@ -42,6 +43,9 @@ app.set('views', path.join(__dirname, '../views'));
 
 // Serving static files
 app.use(express.static(path.join(__dirname, '../public')));
+
+app.use(cors());
+app.options('*', cors());
 
 // SECURITY HTTP headers
 const scriptSrcUrls = [
