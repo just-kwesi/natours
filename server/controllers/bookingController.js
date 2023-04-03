@@ -33,7 +33,9 @@ exports.getCheckoutSession = async (req, res, next) => {
       // success_url: `${req.protocol}://${req.get(
       //   'host'
       // )}/my-tours?alert=booking`,
-      success_url: `${req.protocol}://${req.get('host')}/my-tours`,
+      success_url: `${req.protocol}://${req.get(
+        'host'
+      )}/my-tours?alert=booking`,
       cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
       customer_email: req.user.email,
       client_reference_id: req.params.tourId,
@@ -68,7 +70,11 @@ const createBookingCheckout = async (session) => {
     const userEmail = (await User.findOne({ email: session.customer_email }))
       .id;
     const price = session.amount_subtotal / 100;
-  } catch (error) {}
+
+    await Booking.create({ tour, user, price });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 exports.createBooking = factory.createOne(Booking);

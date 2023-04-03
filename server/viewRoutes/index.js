@@ -5,6 +5,8 @@ const authController = require('../controllers/authController');
 const bookingController = require('../controllers/bookingController');
 
 module.exports = router;
+
+router.use(viewController.alerts);
 router.get(
   '/',
   // bookingController.createBookingCheckout,
