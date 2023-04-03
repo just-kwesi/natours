@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 require('dotenv').config({ path: './config.env' });
 
@@ -116,6 +117,9 @@ app.use(
     ],
   })
 );
+
+//compression
+app.use(compression());
 
 //api routes
 app.use('/api/v1', require('./api'));
