@@ -6,11 +6,12 @@
     "node": "~18.12.1"
   },
   "scripts": {
-    "start": "nodemon ./server/app.js",
+    "start": "node ./server/app.js",
+    "start:dev": "nodemon ./server/app.js",
     "start:prod": "NODE_ENV=production nodemon ./server/app.js",
     "debug": "ndb ./server/app.js",
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js --public-url .",
-    "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js --public-url ."
+    "build:js": "parcel build ./public/js/index.js --out-dir ./public/js"
   },
   "author": "Frederick",
   "license": "ISC",
